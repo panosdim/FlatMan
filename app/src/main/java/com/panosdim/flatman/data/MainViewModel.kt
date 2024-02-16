@@ -5,18 +5,18 @@ import androidx.lifecycle.ViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Transaction
 import com.panosdim.flatman.utils.TransactionType
-import kotlinx.coroutines.flow.Flow
 
 
 class MainViewModel : ViewModel() {
     private val repository = Repository()
-    val flats = repository.getFlats()
 
-    fun addFlat(flat: Flat): Flow<Boolean> = repository.addFlat(flat)
+    fun getFlats() = repository.getFlats()
 
-    fun updateFlat(flat: Flat): Flow<Boolean> = repository.updateFlat(flat)
+    fun addFlat(flat: Flat) = repository.addFlat(flat)
 
-    fun deleteFlat(flat: Flat): Flow<Boolean> = repository.deleteFlat(flat)
+    fun updateFlat(flat: Flat) = repository.updateFlat(flat)
+
+    fun deleteFlat(flat: Flat) = repository.deleteFlat(flat)
 
     fun addTransaction(flatId: String, transaction: Transaction, transactionType: TransactionType) =
         repository.addTransaction(flatId, transaction, transactionType)

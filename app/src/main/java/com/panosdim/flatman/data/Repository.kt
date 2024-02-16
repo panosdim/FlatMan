@@ -11,7 +11,6 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.panosdim.flatman.TAG
 import com.panosdim.flatman.models.Flat
-import com.panosdim.flatman.models.Response
 import com.panosdim.flatman.models.Transaction
 import com.panosdim.flatman.utils.TransactionType
 import kotlinx.coroutines.cancel
@@ -26,12 +25,11 @@ class Repository {
     private val database = Firebase.database
     private var listeners: MutableMap<DatabaseReference, ValueEventListener> = mutableMapOf()
 
-    fun getFlats(): Flow<Response<List<Flat>>> = callbackFlow {
+    fun getFlats(): Flow<List<Flat>> = callbackFlow {
         val dbRef = user?.let { database.getReference(it.uid).child("flats") }
 
         val listener = dbRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                trySend(Response.Loading)
                 val items = mutableListOf<Flat>()
                 snapshot.children.forEach { flat ->
                     val itm = flat.getValue(Flat::class.java)
@@ -41,11 +39,11 @@ class Repository {
                     }
                 }
 
-                trySend(Response.Success(items))
+                trySend(items)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                trySend(Response.Error(error.message))
+                Log.e(TAG, error.toString())
                 cancel()
             }
 
@@ -61,12 +59,9 @@ class Repository {
                 listeners.remove(dbRef, it)
             }
         }
-
-        Log.d(TAG, "getFlats")
     }
 
     fun getSavings(): Flow<BigDecimal> {
-        Log.d(TAG, "getSavings")
         val totalExpenses = getTotalExpenses()
         val totalRents = getTotalRents()
         return totalRents.combine(totalExpenses) { totRents, totExpenses -> totRents - totExpenses }
@@ -95,7 +90,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -133,7 +127,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -149,7 +142,6 @@ class Repository {
     }
 
     fun getSavings(flatId: String): Flow<BigDecimal> {
-        Log.d(TAG, "getSavings for specific flat $flatId")
         val totalExpenses = getTotalExpenses(flatId)
         val totalRents = getTotalRents(flatId)
         return totalRents.combine(totalExpenses) { totRents, totExpenses -> totRents - totExpenses }
@@ -210,7 +202,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -248,7 +239,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -261,8 +251,6 @@ class Repository {
                 listeners.remove(dbRef, it)
             }
         }
-
-        Log.d(TAG, "getExpenses")
     }
 
     fun getRents(flatId: String): Flow<List<Transaction>> = callbackFlow {
@@ -288,7 +276,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -301,8 +288,6 @@ class Repository {
                 listeners.remove(dbRef, it)
             }
         }
-
-        Log.d(TAG, "getRents")
     }
 
     fun getLastRent(flatId: String): Flow<Transaction> = callbackFlow {
@@ -329,7 +314,6 @@ class Repository {
                 Log.e(TAG, error.toString())
                 cancel()
             }
-
         })
 
         listener?.let {
@@ -342,34 +326,31 @@ class Repository {
                 listeners.remove(dbRef, it)
             }
         }
-
-        Log.d(TAG, "getLastRent")
     }
 
     fun addTransaction(
         flatId: String,
         transaction: Transaction,
         transactionType: TransactionType
-    ): Flow<Boolean> =
-        callbackFlow {
-            val dbRef = user?.let {
-                database.getReference(it.uid).child(transactionType.getFirebasePath()).child(flatId)
-            }
-
-            dbRef?.push()?.setValue(transaction)
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }
-                ?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-
-            awaitClose {
-                channel.close()
-            }
+    ): Flow<Boolean> = callbackFlow {
+        val dbRef = user?.let {
+            database.getReference(it.uid).child(transactionType.getFirebasePath()).child(flatId)
         }
+
+        dbRef?.push()?.setValue(transaction)
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
+            }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        awaitClose {
+            channel.close()
+        }
+    }
 
     fun updateTransaction(
         flatId: String,

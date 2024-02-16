@@ -45,8 +45,8 @@ fun FlatExpenses(flat: Flat) {
     val listState = rememberLazyListState()
     val context = LocalContext.current
 
-    val expenses by
-    viewModel.getExpenses(flat.id.toString()).collectAsStateWithLifecycle(initialValue = null)
+    val expenses by viewModel.getExpenses(flat.id.toString())
+        .collectAsStateWithLifecycle(initialValue = null)
 
     expenses?.let {
         Column(

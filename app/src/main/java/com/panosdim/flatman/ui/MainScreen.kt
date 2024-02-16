@@ -1,8 +1,8 @@
 package com.panosdim.flatman.ui
 
 import android.app.Activity
+import android.content.BroadcastReceiver
 import android.content.Intent
-import android.widget.Toast
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,9 +29,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -47,8 +44,6 @@ import com.panosdim.flatman.FlatActivity
 import com.panosdim.flatman.LoginActivity
 import com.panosdim.flatman.R
 import com.panosdim.flatman.data.MainViewModel
-import com.panosdim.flatman.models.Flat
-import com.panosdim.flatman.models.Response
 import com.panosdim.flatman.paddingLarge
 import com.panosdim.flatman.ui.theme.savingsDark
 import com.panosdim.flatman.ui.theme.savingsLight
@@ -56,53 +51,20 @@ import com.panosdim.flatman.utils.moneyFormat
 import java.math.BigDecimal
 
 @Composable
-fun MainScreen() {
+fun MainScreen(onComplete: BroadcastReceiver) {
     val context = LocalContext.current
     val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val listState = rememberLazyListState()
-
-    var isLoading by remember {
-        mutableStateOf(false)
-    }
 
     val darkTheme: Boolean = isSystemInDarkTheme()
 
     val totalSavings = viewModel.getSavings()
         .collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
 
-    var flats by remember { mutableStateOf(emptyList<Flat>()) }
+    val flats by viewModel.getFlats().collectAsStateWithLifecycle(initialValue = null)
 
-    val flatsResponse =
-        viewModel.flats.collectAsStateWithLifecycle(initialValue = Response.Loading)
-
-    when (flatsResponse.value) {
-        is Response.Success -> {
-            isLoading = false
-
-            flats =
-                (flatsResponse.value as Response.Success<List<Flat>>).data
-        }
-
-        is Response.Error -> {
-            Toast.makeText(
-                context,
-                (flatsResponse.value as Response.Error).errorMessage,
-                Toast.LENGTH_SHORT
-            )
-                .show()
-
-            isLoading = false
-        }
-
-        is Response.Loading -> {
-            isLoading = true
-        }
-    }
-
-    if (isLoading) {
-        ProgressBar()
-    } else {
+    flats?.let {
         Column(
             modifier = Modifier.padding(paddingLarge),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -135,7 +97,7 @@ fun MainScreen() {
                     FilledTonalButton(
                         onClick = {
                             viewModel.signOut()
-//                            context.unregisterReceiver(onComplete)
+                            context.unregisterReceiver(onComplete)
                             Firebase.auth.signOut()
                             (context as? Activity)?.finish()
 
@@ -194,8 +156,8 @@ fun MainScreen() {
                 contentPadding = PaddingValues(horizontal = paddingLarge, vertical = paddingLarge),
                 state = listState
             ) {
-                if (flats.isNotEmpty()) {
-                    flats.iterator().forEachRemaining {
+                if (it.isNotEmpty()) {
+                    it.iterator().forEachRemaining {
                         item {
                             FlatCard(flat = it)
                         }
@@ -221,5 +183,7 @@ fun MainScreen() {
                 }
             }
         }
+    } ?: run {
+        ProgressBar()
     }
 }

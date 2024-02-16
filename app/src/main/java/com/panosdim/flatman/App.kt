@@ -11,5 +11,4 @@ const val FLAT = "FLAT"
 const val TRANSACTION_TYPE = "TRANSACTION_TYPE"
 const val TRANSACTION = "TRANSACTION"
 
-
 const val TAG = "FlatMan-Tag"
