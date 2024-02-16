@@ -12,17 +12,11 @@ class MainViewModel : ViewModel() {
     private val repository = Repository()
     val flats = repository.getFlats()
 
-    fun addNewItem(item: Flat): Flow<Boolean> {
-        return repository.addNewItem(item)
-    }
+    fun addFlat(flat: Flat): Flow<Boolean> = repository.addFlat(flat)
 
-    fun updateItem(item: Flat): Flow<Boolean> {
-        return repository.updateItem(item)
-    }
+    fun updateFlat(flat: Flat): Flow<Boolean> = repository.updateFlat(flat)
 
-    fun deleteItem(item: Flat): Flow<Boolean> {
-        return repository.deleteItem(item)
-    }
+    fun deleteFlat(flat: Flat): Flow<Boolean> = repository.deleteFlat(flat)
 
     fun addTransaction(flatId: String, transaction: Transaction, transactionType: TransactionType) =
         repository.addTransaction(flatId, transaction, transactionType)

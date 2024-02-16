@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.panosdim.flatman.FlatActivity
 import com.panosdim.flatman.LoginActivity
 import com.panosdim.flatman.R
 import com.panosdim.flatman.data.MainViewModel
@@ -74,8 +75,6 @@ fun MainScreen() {
 
     val flatsResponse =
         viewModel.flats.collectAsStateWithLifecycle(initialValue = Response.Loading)
-
-    var flat: Flat? by remember { mutableStateOf(null) }
 
     when (flatsResponse.value) {
         is Response.Success -> {
@@ -117,7 +116,11 @@ fun MainScreen() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Button(onClick = { /* Start activity to add Flat */ }) {
+                    Button(onClick = {
+                        val intent = Intent(context, FlatActivity::class.java)
+
+                        context.startActivity(intent)
+                    }) {
                         Icon(
                             Icons.Outlined.Add,
                             contentDescription = null,

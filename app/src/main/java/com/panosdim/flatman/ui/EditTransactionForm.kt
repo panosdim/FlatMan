@@ -21,7 +21,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -144,38 +143,38 @@ fun EditTransactionForm(
                         isLoading = true
 
                         scope.launch {
-                            viewModel.deleteTransaction(flat.id, transaction, transactionType)
-                                .collect {
-                                    withContext(Dispatchers.Main) {
-                                        if (it) {
-                                            isLoading = false
+                            flat.id?.let {
+                                viewModel.deleteTransaction(it, transaction, transactionType)
+                                    .collect {
+                                        withContext(Dispatchers.Main) {
+                                            if (it) {
+                                                if (transactionType == TransactionType.EXPENSES) {
+                                                    Toast.makeText(
+                                                        context,
+                                                        R.string.delete_expense_result,
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                } else {
+                                                    Toast.makeText(
+                                                        context,
+                                                        R.string.delete_rent_result,
+                                                        Toast.LENGTH_LONG
+                                                    ).show()
+                                                }
 
-                                            if (transactionType == TransactionType.EXPENSES) {
-                                                Toast.makeText(
-                                                    context,
-                                                    R.string.delete_expense_result,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
+                                                (context as? Activity)?.finish()
                                             } else {
+                                                isLoading = false
+
                                                 Toast.makeText(
                                                     context,
-                                                    R.string.delete_rent_result,
+                                                    R.string.generic_error_toast,
                                                     Toast.LENGTH_LONG
                                                 ).show()
                                             }
-
-                                            (context as? Activity)?.finish()
-                                        } else {
-                                            isLoading = false
-
-                                            Toast.makeText(
-                                                context,
-                                                R.string.generic_error_toast,
-                                                Toast.LENGTH_LONG
-                                            ).show()
                                         }
                                     }
-                                }
+                            }
                         }
                     }
                 ) {
@@ -192,6 +191,10 @@ fun EditTransactionForm(
                 }
             }
         )
+    }
+
+    if (isLoading) {
+        ProgressBar()
     }
 
     Card(
@@ -287,14 +290,6 @@ fun EditTransactionForm(
                 state = datePickerState, label = stringResource(id = R.string.date)
             )
 
-            if (isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = paddingLarge)
-                )
-            }
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -303,7 +298,6 @@ fun EditTransactionForm(
                     .padding(top = paddingLarge)
             ) {
                 OutlinedButton(
-                    enabled = !isLoading,
                     onClick = { openDeleteDialog.value = true },
                 ) {
                     Icon(
@@ -316,7 +310,7 @@ fun EditTransactionForm(
                 }
 
                 Button(
-                    enabled = isFormValid() && !isLoading,
+                    enabled = isFormValid(),
                     onClick = {
                         datePickerState.selectedDateMillis?.toLocalDate()?.let {
                             isLoading = true
@@ -327,38 +321,38 @@ fun EditTransactionForm(
                             transaction.comment = comment.value
 
                             scope.launch {
-                                viewModel.updateTransaction(flat.id, transaction, transactionType)
-                                    .collect {
-                                        withContext(Dispatchers.Main) {
-                                            if (it) {
-                                                isLoading = false
+                                flat.id?.let { id ->
+                                    viewModel.updateTransaction(id, transaction, transactionType)
+                                        .collect {
+                                            withContext(Dispatchers.Main) {
+                                                if (it) {
+                                                    if (transactionType == TransactionType.EXPENSES) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            R.string.update_expense_result,
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    } else {
+                                                        Toast.makeText(
+                                                            context,
+                                                            R.string.update_rent_result,
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
 
-                                                if (transactionType == TransactionType.EXPENSES) {
-                                                    Toast.makeText(
-                                                        context,
-                                                        R.string.update_expense_result,
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
+                                                    (context as? Activity)?.finish()
                                                 } else {
+                                                    isLoading = false
+
                                                     Toast.makeText(
                                                         context,
-                                                        R.string.update_rent_result,
+                                                        R.string.generic_error_toast,
                                                         Toast.LENGTH_LONG
                                                     ).show()
                                                 }
-
-                                                (context as? Activity)?.finish()
-                                            } else {
-                                                isLoading = false
-
-                                                Toast.makeText(
-                                                    context,
-                                                    R.string.generic_error_toast,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
                                             }
                                         }
-                                    }
+                                }
                             }
                         }
                     },

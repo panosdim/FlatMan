@@ -55,6 +55,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -101,6 +102,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -138,6 +140,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -179,6 +182,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -213,6 +217,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -250,6 +255,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -289,6 +295,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -313,8 +320,9 @@ class Repository {
                 }
 
                 rents.sortByDescending { it.date }
-
-                trySend(rents[0])
+                if (rents.isNotEmpty()) {
+                    trySend(rents.first())
+                }
             }
 
             override fun onCancelled(error: DatabaseError) {
@@ -328,6 +336,7 @@ class Repository {
             listeners.put(dbRef, it)
         }
         awaitClose {
+            channel.close()
             listener?.let {
                 dbRef.removeEventListener(it)
                 listeners.remove(dbRef, it)
@@ -366,123 +375,146 @@ class Repository {
         flatId: String,
         transaction: Transaction,
         transactionType: TransactionType
-    ): Flow<Boolean> =
-        callbackFlow {
-            val dbRef = user?.let {
+    ): Flow<Boolean> = callbackFlow {
+        val dbRef = user?.let {
+            transaction.id?.let { id ->
                 database.getReference(it.uid).child(transactionType.getFirebasePath()).child(flatId)
-                    .child(transaction.id)
-            }
-
-            dbRef?.setValue(transaction)
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }
-                ?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-            dbRef?.child("id")?.removeValue()
-
-            awaitClose {
-                channel.close()
+                    .child(id)
             }
         }
+
+        dbRef?.setValue(transaction)
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
+            }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+        dbRef?.child("id")?.removeValue()
+
+        awaitClose {
+            channel.close()
+        }
+    }
 
     fun deleteTransaction(
         flatId: String,
         transaction: Transaction,
         transactionType: TransactionType
-    ): Flow<Boolean> =
-        callbackFlow {
-            val dbRef = user?.let {
+    ): Flow<Boolean> = callbackFlow {
+        val dbRef = user?.let {
+            transaction.id?.let { id ->
                 database.getReference(it.uid).child(transactionType.getFirebasePath()).child(flatId)
-                    .child(transaction.id)
-            }
-
-            dbRef?.removeValue()
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }
-                ?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-
-            awaitClose {
-                channel.close()
+                    .child(id)
             }
         }
 
-    fun addNewItem(item: Flat): Flow<Boolean> {
-        return callbackFlow {
-            val itemsRef = user?.let { database.getReference("items").child(it.uid) }
-
-            itemsRef?.push()?.setValue(item)
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }
-                ?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-
-            awaitClose {
-                channel.close()
+        dbRef?.removeValue()
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
             }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        awaitClose {
+            channel.close()
         }
     }
 
-    fun updateItem(item: Flat): Flow<Boolean> {
-        val itemsRef = user?.let {
-            item.id.let { id ->
-                database.getReference("items").child(it.uid).child(
-                    id
-                )
-            }
+    fun addFlat(flat: Flat): Flow<Boolean> = callbackFlow {
+        val dbRef = user?.let {
+            database.getReference(it.uid).child("flats")
         }
 
-        return callbackFlow {
-            itemsRef?.setValue(item)
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-            itemsRef?.child("id")?.removeValue()
-
-            awaitClose {
-                channel.close()
+        dbRef?.push()?.setValue(flat)
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
             }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        awaitClose {
+            channel.close()
         }
     }
 
-    fun deleteItem(item: Flat): Flow<Boolean> {
-        val itemsRef = user?.let {
-            item.id.let { id ->
-                database.getReference("items").child(it.uid).child(
-                    id
-                )
-            }
+    fun updateFlat(flat: Flat): Flow<Boolean> = callbackFlow {
+        val dbRef = user?.let {
+            flat.id?.let { id -> database.getReference(it.uid).child("flats").child(id) }
         }
 
-        return callbackFlow {
-            itemsRef?.removeValue()
-                ?.addOnSuccessListener {
-                    trySend(true)
-                    cancel()
-                }?.addOnFailureListener {
-                    trySend(false)
-                    cancel()
-                }
-
-            awaitClose {
-                channel.close()
+        dbRef?.setValue(flat)
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
             }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+        dbRef?.child("id")?.removeValue()
+
+        awaitClose {
+            channel.close()
+        }
+    }
+
+    fun deleteFlat(flat: Flat): Flow<Boolean> = callbackFlow {
+        // Delete expenses connected with flat
+        var dbRef = user?.let {
+            flat.id?.let { id -> database.getReference(it.uid).child("expenses").child(id) }
+        }
+
+        dbRef?.removeValue()
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
+            }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        // Delete rents connected with flat
+        dbRef = user?.let {
+            flat.id?.let { id -> database.getReference(it.uid).child("rents").child(id) }
+        }
+
+        dbRef?.removeValue()
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
+            }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        // Delete flat
+        dbRef = user?.let {
+            flat.id?.let { id -> database.getReference(it.uid).child("flats").child(id) }
+        }
+
+        dbRef?.removeValue()
+            ?.addOnSuccessListener {
+                trySend(true)
+                cancel()
+            }
+            ?.addOnFailureListener {
+                trySend(false)
+                cancel()
+            }
+
+        awaitClose {
+            channel.close()
         }
     }
 

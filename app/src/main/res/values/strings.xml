@@ -41,5 +41,22 @@
     <string name="delete_transaction_dialog_description">If you delete the transaction you will not be able to recover it.</string>
     <string name="delete_expense_result">Expense deleted successfully</string>
     <string name="delete_rent_result">Rent deleted successfully</string>
+    <string name="title_activity_flat">FlatActivity</string>
+    <string name="new_flat">Create new flat</string>
+    <string name="address_error_empty">Address cannot be empty</string>
+    <string name="lessee_name_error_empty">Lessee name cannot be empty</string>
+    <string name="address">Address</string>
+    <string name="lessee_rent_error_empty">Lessee rent cannot be empty</string>
+    <string name="lessee_name">Lessee Name</string>
+    <string name="rent">Rent</string>
+    <string name="date_from">Contract From</string>
+    <string name="date_until">Contract Until</string>
+    <string name="add_lessee">Add Lessee</string>
+    <string name="remove_lessee">Remove Lessee</string>
+    <string name="add_flat_result">Flat added successfully</string>
+    <string name="delete_flat_dialog_title">Delete Flat?</string>
+    <string name="delete_flat_dialog_description">If you delete the flat all expenses and rents of the flat will also be deleted.</string>
+    <string name="delete_flat_result">Flat deleted successfully</string>
+    <string name="update_flat_result">Flat updated successfully</string>
 
 </resources>

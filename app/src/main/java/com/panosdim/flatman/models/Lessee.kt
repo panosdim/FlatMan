@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Lessee(
     var name: String = "",
-    var rent: Int = 0,
+    var rent: Float = 0.0F,
     var start: String = "",
     var end: String = "",
 )

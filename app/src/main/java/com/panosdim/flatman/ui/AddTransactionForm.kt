@@ -19,7 +19,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -121,7 +120,8 @@ fun AddTransactionForm(
             }
         }
 
-        val rent by viewModel.getLastRent(flat.id).collectAsStateWithLifecycle(initialValue = null)
+        val rent by viewModel.getLastRent(flat.id.toString())
+            .collectAsStateWithLifecycle(initialValue = null)
         rent?.let {
             val lastRentComment: RentComment? = RentComment::comment.findOrNull(it.comment)
             comment.value = lastRentComment?.next()?.comment.toString()
@@ -130,6 +130,10 @@ fun AddTransactionForm(
 
     fun isFormValid(): Boolean {
         return !(amount.hasError || comment.hasError)
+    }
+
+    if (isLoading) {
+        ProgressBar()
     }
 
     Card(
@@ -226,14 +230,6 @@ fun AddTransactionForm(
                 state = datePickerState, label = stringResource(id = R.string.date)
             )
 
-            if (isLoading) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = paddingLarge)
-                )
-            }
-
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.End,
@@ -242,50 +238,51 @@ fun AddTransactionForm(
                     .padding(top = paddingLarge)
             ) {
                 Button(
-                    enabled = isFormValid() && !isLoading,
+                    enabled = isFormValid(),
                     onClick = {
                         datePickerState.selectedDateMillis?.toLocalDate()?.let {
                             isLoading = true
 
                             val newTransaction = Transaction(
+                                id = null,
                                 amount = amount.value.toFloat(),
                                 date = it.toString(),
                                 comment = comment.value
                             )
 
                             scope.launch {
-                                viewModel.addTransaction(flat.id, newTransaction, transactionType)
-                                    .collect {
-                                        withContext(Dispatchers.Main) {
-                                            if (it) {
-                                                isLoading = false
+                                flat.id?.let { id ->
+                                    viewModel.addTransaction(id, newTransaction, transactionType)
+                                        .collect {
+                                            withContext(Dispatchers.Main) {
+                                                if (it) {
+                                                    if (transactionType == TransactionType.EXPENSES) {
+                                                        Toast.makeText(
+                                                            context,
+                                                            R.string.add_expense_result,
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    } else {
+                                                        Toast.makeText(
+                                                            context,
+                                                            R.string.add_rent_result,
+                                                            Toast.LENGTH_LONG
+                                                        ).show()
+                                                    }
 
-                                                if (transactionType == TransactionType.EXPENSES) {
-                                                    Toast.makeText(
-                                                        context,
-                                                        R.string.add_expense_result,
-                                                        Toast.LENGTH_LONG
-                                                    ).show()
+                                                    (context as? Activity)?.finish()
                                                 } else {
+                                                    isLoading = false
+
                                                     Toast.makeText(
                                                         context,
-                                                        R.string.add_rent_result,
+                                                        R.string.generic_error_toast,
                                                         Toast.LENGTH_LONG
                                                     ).show()
                                                 }
-
-                                                (context as? Activity)?.finish()
-                                            } else {
-                                                isLoading = false
-
-                                                Toast.makeText(
-                                                    context,
-                                                    R.string.generic_error_toast,
-                                                    Toast.LENGTH_LONG
-                                                ).show()
                                             }
                                         }
-                                    }
+                                }
                             }
                         }
                     },

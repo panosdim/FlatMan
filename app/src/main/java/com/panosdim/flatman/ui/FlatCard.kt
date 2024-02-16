@@ -15,8 +15,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.panosdim.flatman.FLAT
+import com.panosdim.flatman.FlatActivity
 import com.panosdim.flatman.FlatTransactionsActivity
 import com.panosdim.flatman.R
 import com.panosdim.flatman.TRANSACTION_TYPE
@@ -62,7 +63,7 @@ fun FlatCard(
     val resources = context.resources
     val viewModel: MainViewModel = viewModel()
 
-    val flatSavings = viewModel.getSavings(flat.id)
+    val flatSavings = viewModel.getSavings(flat.id.toString())
         .collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
 
     val darkTheme: Boolean = isSystemInDarkTheme()
@@ -142,7 +143,13 @@ fun FlatCard(
                     }
                 }
 
-                IconButton(onClick = { /* doSomething() */ }) {
+                FilledIconButton(onClick = {
+                    val intent = Intent(context, FlatActivity::class.java)
+                    val flatJson = Json.encodeToString(flat)
+
+                    intent.putExtra(FLAT, flatJson)
+                    context.startActivity(intent)
+                }) {
                     Icon(
                         Icons.Outlined.Edit,
                         contentDescription = null,

@@ -1,6 +1,5 @@
 package com.panosdim.flatman
 
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -23,32 +22,22 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.panosdim.flatman.models.Flat
-import com.panosdim.flatman.models.Transaction
-import com.panosdim.flatman.ui.AddTransactionForm
-import com.panosdim.flatman.ui.EditTransactionForm
+import com.panosdim.flatman.ui.AddFlatForm
+import com.panosdim.flatman.ui.EditFlatForm
 import com.panosdim.flatman.ui.theme.FlatManTheme
-import com.panosdim.flatman.utils.TransactionType
 import kotlinx.serialization.json.Json
 
-class TransactionActivity : ComponentActivity() {
-    @Suppress("DEPRECATION")
+class FlatActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val flatJson: String = intent.getStringExtra(FLAT).toString()
-        val transactionType: TransactionType? =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                intent.getSerializableExtra(TRANSACTION_TYPE, TransactionType::class.java)
-            } else {
-                intent.getSerializableExtra(TRANSACTION_TYPE) as TransactionType
-            }
-        val transactionJson: String = intent.getStringExtra(TRANSACTION).toString()
-        val flat: Flat = Json.decodeFromString<Flat>(flatJson)
-        val transaction: Transaction? = try {
-            Json.decodeFromString<Transaction>(transactionJson)
+        val flat: Flat? = try {
+            Json.decodeFromString<Flat>(flatJson)
         } catch (_: Exception) {
             null
         }
@@ -72,8 +61,7 @@ class TransactionActivity : ComponentActivity() {
                                 ),
                                 title = {
                                     Text(
-                                        flat.address,
-                                        style = MaterialTheme.typography.headlineMedium,
+                                        flat?.address ?: stringResource(id = R.string.new_flat),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
@@ -96,19 +84,12 @@ class TransactionActivity : ComponentActivity() {
                                 .fillMaxHeight(),
                             verticalArrangement = Arrangement.Bottom
                         ) {
-                            if (transactionType != null) {
-                                if (transaction == null) {
-                                    AddTransactionForm(
-                                        flat = flat,
-                                        transactionType = transactionType
-                                    )
-                                } else {
-                                    EditTransactionForm(
-                                        flat = flat,
-                                        transactionType = transactionType,
-                                        transaction = transaction
-                                    )
-                                }
+                            if (flat == null) {
+                                AddFlatForm()
+                            } else {
+                                EditFlatForm(
+                                    flat = flat,
+                                )
                             }
                         }
                     }

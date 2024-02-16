@@ -46,7 +46,7 @@ fun FlatExpenses(flat: Flat) {
     val context = LocalContext.current
 
     val expenses by
-    viewModel.getExpenses(flat.id).collectAsStateWithLifecycle(initialValue = null)
+    viewModel.getExpenses(flat.id.toString()).collectAsStateWithLifecycle(initialValue = null)
 
     expenses?.let {
         Column(

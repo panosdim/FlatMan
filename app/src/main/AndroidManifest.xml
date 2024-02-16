@@ -16,6 +16,12 @@
         android:theme="@style/Theme.FlatMan"
         tools:targetApi="31">
         <activity
+            android:name=".FlatActivity"
+            android:exported="false"
+            android:label="@string/title_activity_flat"
+            android:theme="@style/Theme.FlatMan"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".TransactionActivity"
             android:exported="false"
             android:theme="@style/Theme.FlatMan"

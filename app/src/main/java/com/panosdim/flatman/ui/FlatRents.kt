@@ -46,7 +46,7 @@ fun FlatRents(flat: Flat) {
     val context = LocalContext.current
 
     val rents by
-    viewModel.getRents(flat.id).collectAsStateWithLifecycle(initialValue = null)
+    viewModel.getRents(flat.id.toString()).collectAsStateWithLifecycle(initialValue = null)
 
     rents?.let {
         Column(
