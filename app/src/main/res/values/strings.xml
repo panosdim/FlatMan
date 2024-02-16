@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">FlatMan</string>
+    <string name="authentication_failed">Authentication failed</string>
+    <string name="login">Login</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="icon_password_visible">Password Visible</string>
+    <string name="icon_password_hidden">Password Hidden</string>
+    <string name="new_version">New version is downloading on the background</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_flat">Add Flat</string>
+    <string name="logout">Logout</string>
+    <string name="no_items">No flats found</string>
+    <string name="rent_ends">Contract ends: %1$s</string>
+    <string name="flat_savings">Savings: %1$s</string>
+    <string name="total_savings">Total Savings</string>
+    <string name="add_expense">Add Expense</string>
+    <string name="add_rent">Add Rent</string>
+    <string name="no_rents">No rents found</string>
+    <string name="no_expenses">No expenses found</string>
+    <string name="amount">Amount</string>
+    <string name="comment">Comment</string>
+    <string name="date">Date</string>
+    <string name="add">Add</string>
+    <string name="comment_error_empty">Comment cannot by empty</string>
+    <string name="amount_error_empty">Amount cannot be empty</string>
+    <string name="add_expense_result">Expense added successfully</string>
+    <string name="add_rent_result">Rent added successfully</string>
+    <string name="generic_error_toast">Something went wrong. Try again.</string>
+    <string name="edit_rent">Edit Rent</string>
+    <string name="edit_expense">Edit Expense</string>
+    <string name="update_expense_result">Expense updated successfully</string>
+    <string name="update_rent_result">Rent updated successfully</string>
+    <string name="delete">Delete</string>
+    <string name="update">Update</string>
+    <string name="confirm">Confirm</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="delete_expense_dialog_title">Delete expense?</string>
+    <string name="delete_rent_dialog_title">Delete rent?</string>
+    <string name="delete_transaction_dialog_description">If you delete the transaction you will not be able to recover it.</string>
+    <string name="delete_expense_result">Expense deleted successfully</string>
+    <string name="delete_rent_result">Rent deleted successfully</string>
+
+</resources>
