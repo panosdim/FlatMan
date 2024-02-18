@@ -30,3 +30,8 @@ fun String.formatDate(): String {
     val date = this.toLocalDate()
     return date.format(dateFormatter) ?: ""
 }
+
+fun isDateInPreviousYear(date: LocalDate): Boolean {
+    val previousYear = LocalDate.now().year - 1
+    return date.year == previousYear
+}

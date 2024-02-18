@@ -52,7 +52,6 @@ import com.panosdim.flatman.utils.FieldState
 import com.panosdim.flatman.utils.RentComment
 import com.panosdim.flatman.utils.TransactionType
 import com.panosdim.flatman.utils.currencyRegex
-import com.panosdim.flatman.utils.findOrNull
 import com.panosdim.flatman.utils.next
 import com.panosdim.flatman.utils.toEpochMilli
 import com.panosdim.flatman.utils.toLocalDate
@@ -123,8 +122,7 @@ fun AddTransactionForm(
         val rent by viewModel.getLastRent(flat.id.toString())
             .collectAsStateWithLifecycle(initialValue = null)
         rent?.let {
-            val lastRentComment: RentComment? = RentComment::comment.findOrNull(it.comment)
-            comment.value = lastRentComment?.next()?.comment.toString()
+            comment.value = RentComment.next(it.comment)
         }
     }
 

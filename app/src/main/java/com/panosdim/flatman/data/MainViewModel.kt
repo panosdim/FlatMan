@@ -45,6 +45,8 @@ class MainViewModel : ViewModel() {
 
     fun getSavings(flatId: String) = repository.getSavings(flatId)
 
+    fun getLastYearSavings() = repository.getLastYearSavings()
+
     fun signOut() {
         repository.signOut()
     }

@@ -45,8 +45,10 @@ import com.panosdim.flatman.LoginActivity
 import com.panosdim.flatman.R
 import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.paddingLarge
-import com.panosdim.flatman.ui.theme.savingsDark
-import com.panosdim.flatman.ui.theme.savingsLight
+import com.panosdim.flatman.ui.theme.blueDark
+import com.panosdim.flatman.ui.theme.blueLight
+import com.panosdim.flatman.ui.theme.redDark
+import com.panosdim.flatman.ui.theme.redLight
 import com.panosdim.flatman.utils.moneyFormat
 import java.math.BigDecimal
 
@@ -61,6 +63,9 @@ fun MainScreen(onComplete: BroadcastReceiver) {
 
     val totalSavings = viewModel.getSavings()
         .collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
+
+    val lastYearSavings =
+        viewModel.getLastYearSavings().collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
 
     val flats by viewModel.getFlats().collectAsStateWithLifecycle(initialValue = null)
 
@@ -121,31 +126,78 @@ fun MainScreen(onComplete: BroadcastReceiver) {
 
                 ElevatedCard(
                     modifier = Modifier
-                        .padding(paddingLarge),
+                        .padding(paddingLarge)
+                        .fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                     elevation = CardDefaults.cardElevation(
                         defaultElevation = 6.dp
                     ),
                 ) {
-                    Column(
-                        modifier = Modifier.padding(paddingLarge),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
+                    Column(modifier = Modifier.padding(paddingLarge)) {
                         Text(
+                            modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.Center,
-                            text = resources.getString(R.string.total_savings),
+                            text = resources.getString(R.string.savings),
                             style = MaterialTheme.typography.headlineLarge,
                             fontWeight = FontWeight.Bold
                         )
-                        Text(
-                            textAlign = TextAlign.Center,
-                            text = moneyFormat(totalSavings.value),
-                            style = MaterialTheme.typography.headlineLarge,
-                            color = if (darkTheme) savingsDark else savingsLight,
-                            fontWeight = FontWeight.Bold
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    text = resources.getString(R.string.total),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    text = moneyFormat(totalSavings.value),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = if (totalSavings.value > BigDecimal(0)) {
+                                        if (darkTheme) blueDark else blueLight
+                                    } else {
+                                        if (darkTheme) redDark else redLight
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxWidth()
+                            ) {
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    text = resources.getString(R.string.last_year),
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    textAlign = TextAlign.Center,
+                                    text = moneyFormat(lastYearSavings.value),
+                                    style = MaterialTheme.typography.headlineSmall,
+                                    color = if (lastYearSavings.value > BigDecimal(0)) {
+                                        if (darkTheme) blueDark else blueLight
+                                    } else {
+                                        if (darkTheme) redDark else redLight
+                                    },
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
                     }
-
                 }
             }
 

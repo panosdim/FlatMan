@@ -1,29 +1,22 @@
 package com.panosdim.flatman.utils
 
-import kotlin.enums.enumEntries
-import kotlin.reflect.KProperty1
+val RentComment = arrayOf(
+    "Ενοίκιο Ιανουαρίου",
+    "Ενοίκιο Φεβρουαρίου",
+    "Ενοίκιο Μαρτίου",
+    "Ενοίκιο Απριλίου",
+    "Ενοίκιο Μαΐου",
+    "Ενοίκιο Ιουνίου",
+    "Ενοίκιο Ιουλίου",
+    "Ενοίκιο Αυγούστου",
+    "Ενοίκιο Σεπτεμβρίου",
+    "Ενοίκιο Οκτωβρίου",
+    "Ενοίκιο Νοεμβρίου",
+    "Ενοίκιο Δεκεμβρίου"
+)
 
-enum class RentComment(val comment: String) {
-    JANUARY("Ενοίκιο Ιανουαρίου"),
-    FEBRUARY("Ενοίκιο Φεβρουαρίου"),
-    MARCH("Ενοίκιο Μαρτίου"),
-    APRIL("Ενοίκιο Απριλίου"),
-    MAY("Ενοίκιο Μαΐου"),
-    JUNE("Ενοίκιο Ιουνίου"),
-    JULY("Ενοίκιο Ιουλίου"),
-    AUGUST("Ενοίκιο Αυγούστου"),
-    SEPTEMBER("Ενοίκιο Σεπτεμβρίου"),
-    OCTOBER("Ενοίκιο Οκτωβρίου"),
-    NOVEMBER("Ενοίκιο Νοεμβρίου"),
-    DECEMBER("Ενοίκιο Δεκεμβρίου"),
+fun Array<String>.next(current: String): String {
+    val index = this.indexOf(current)
+    val nextIndex = (index + 1) % this.size
+    return this[nextIndex]
 }
-
-inline fun <reified T : Enum<T>> T.next(): T {
-    val values = enumValues<T>()
-    val nextOrdinal = (ordinal + 1) % values.size
-    return values[nextOrdinal]
-}
-
-@OptIn(ExperimentalStdlibApi::class)
-inline fun <reified T : Enum<T>, V> KProperty1<T, V>.findOrNull(value: V): T? =
-    enumEntries<T>().firstOrNull { this(it) == value }

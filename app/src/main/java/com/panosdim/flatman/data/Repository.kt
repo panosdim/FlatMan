@@ -13,6 +13,8 @@ import com.panosdim.flatman.TAG
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Transaction
 import com.panosdim.flatman.utils.TransactionType
+import com.panosdim.flatman.utils.isDateInPreviousYear
+import com.panosdim.flatman.utils.toLocalDate
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -111,13 +113,13 @@ class Repository {
 
         val listener = dbRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                val expenses =
+                val rents =
                     snapshot.getValue<MutableMap<String, MutableMap<String, Transaction>>>()
 
-                if (expenses != null) {
+                if (rents != null) {
                     totalRents = BigDecimal.ZERO
-                    expenses.values.forEach { exp ->
-                        totalRents += exp.values.sumOf { it.amount.toBigDecimal() }
+                    rents.values.forEach { rent ->
+                        totalRents += rent.values.sumOf { it.amount.toBigDecimal() }
                     }
                     trySend(totalRents)
                 }
@@ -496,6 +498,88 @@ class Repository {
 
         awaitClose {
             channel.close()
+        }
+    }
+
+    fun getLastYearSavings(): Flow<BigDecimal> {
+        val lastYearExpenses = getLastYearExpenses()
+        val lastYearRents = getLastYearRents()
+        return lastYearRents.combine(lastYearExpenses) { totRents, totExpenses -> totRents - totExpenses }
+    }
+
+    private fun getLastYearExpenses(): Flow<BigDecimal> = callbackFlow {
+        val dbRef = user?.let { database.getReference(it.uid).child("expenses") }
+
+        var totalExpenses: BigDecimal
+
+        val listener = dbRef?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val expenses =
+                    snapshot.getValue<MutableMap<String, MutableMap<String, Transaction>>>()
+
+                if (expenses != null) {
+                    totalExpenses = BigDecimal.ZERO
+                    expenses.values.forEach { exp ->
+                        totalExpenses += exp.values.filter { isDateInPreviousYear(it.date.toLocalDate()) }
+                            .sumOf { it.amount.toBigDecimal() }
+                    }
+                    trySend(totalExpenses)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, error.toString())
+                cancel()
+            }
+        })
+
+        listener?.let {
+            listeners.put(dbRef, it)
+        }
+        awaitClose {
+            channel.close()
+            listener?.let {
+                dbRef.removeEventListener(it)
+                listeners.remove(dbRef, it)
+            }
+        }
+    }
+
+    private fun getLastYearRents(): Flow<BigDecimal> = callbackFlow {
+        val dbRef = user?.let { database.getReference(it.uid).child("rents") }
+
+        var totalRents: BigDecimal
+
+        val listener = dbRef?.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val rents =
+                    snapshot.getValue<MutableMap<String, MutableMap<String, Transaction>>>()
+
+                if (rents != null) {
+                    totalRents = BigDecimal.ZERO
+                    rents.values.forEach { rent ->
+                        totalRents += rent.values.filter { isDateInPreviousYear(it.date.toLocalDate()) }
+                            .sumOf { it.amount.toBigDecimal() }
+                    }
+                    trySend(totalRents)
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                Log.e(TAG, error.toString())
+                cancel()
+            }
+        })
+
+        listener?.let {
+            listeners.put(dbRef, it)
+        }
+        awaitClose {
+            channel.close()
+            listener?.let {
+                dbRef.removeEventListener(it)
+                listeners.remove(dbRef, it)
+            }
         }
     }
 

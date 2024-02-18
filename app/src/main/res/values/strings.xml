@@ -14,7 +14,9 @@
     <string name="no_items">No flats found</string>
     <string name="rent_ends">Contract ends: %1$s</string>
     <string name="flat_savings">Savings: %1$s</string>
-    <string name="total_savings">Total Savings</string>
+    <string name="savings">Savings</string>
+    <string name="total">Total</string>
+    <string name="last_year">Last Year</string>
     <string name="add_expense">Add Expense</string>
     <string name="add_rent">Add Rent</string>
     <string name="no_rents">No rents found</string>

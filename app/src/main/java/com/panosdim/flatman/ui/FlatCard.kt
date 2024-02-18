@@ -39,12 +39,12 @@ import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.paddingLarge
 import com.panosdim.flatman.paddingSmall
-import com.panosdim.flatman.ui.theme.expiredDark
-import com.panosdim.flatman.ui.theme.expiredLight
-import com.panosdim.flatman.ui.theme.expiresSoonDark
-import com.panosdim.flatman.ui.theme.expiresSoonLight
-import com.panosdim.flatman.ui.theme.savingsDark
-import com.panosdim.flatman.ui.theme.savingsLight
+import com.panosdim.flatman.ui.theme.blueDark
+import com.panosdim.flatman.ui.theme.blueLight
+import com.panosdim.flatman.ui.theme.redDark
+import com.panosdim.flatman.ui.theme.redLight
+import com.panosdim.flatman.ui.theme.yellowDark
+import com.panosdim.flatman.ui.theme.yellowLight
 import com.panosdim.flatman.utils.TransactionType
 import com.panosdim.flatman.utils.formatDate
 import com.panosdim.flatman.utils.moneyFormat
@@ -70,18 +70,18 @@ fun FlatCard(
     val today = LocalDate.now()
     val nextMonthLastDay = today.with(TemporalAdjusters.firstDayOfNextMonth())
         .with(TemporalAdjusters.lastDayOfMonth())
-    var color: Color? = null
+    var color: Color = Color.Unspecified
 
     flat.lessee?.let {
         val rentEnds = it.end.toLocalDate()
         if (rentEnds.isBefore(today)) {
-            color = if (darkTheme) expiredDark else expiredLight
+            color = if (darkTheme) redDark else redLight
         }
 
         if ((rentEnds.isBefore(nextMonthLastDay) || rentEnds.isEqual(nextMonthLastDay))
             && rentEnds.isAfter(today)
         ) {
-            color = if (darkTheme) expiresSoonDark else expiresSoonLight
+            color = if (darkTheme) yellowDark else yellowLight
         }
     }
 
@@ -122,24 +122,14 @@ fun FlatCard(
                             text = moneyFormat(it.rent),
                             style = MaterialTheme.typography.headlineSmall
                         )
-                        color?.let { color ->
-                            Text(
-                                text = resources.getString(
-                                    R.string.rent_ends,
-                                    it.end.formatDate()
-                                ),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = color
-                            )
-                        } ?: run {
-                            Text(
-                                text = resources.getString(
-                                    R.string.rent_ends,
-                                    it.end.formatDate()
-                                ),
-                                style = MaterialTheme.typography.headlineSmall,
-                            )
-                        }
+                        Text(
+                            text = resources.getString(
+                                R.string.rent_ends,
+                                it.end.formatDate()
+                            ),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = color
+                        )
                     }
                 }
 
@@ -166,7 +156,7 @@ fun FlatCard(
                     R.string.flat_savings,
                     moneyFormat(flatSavings.value)
                 ),
-                color = if (darkTheme) savingsDark else savingsLight,
+                color = if (darkTheme) blueDark else blueLight,
                 style = MaterialTheme.typography.headlineSmall
             )
 
