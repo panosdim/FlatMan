@@ -51,8 +51,11 @@ import com.panosdim.flatman.paddingLarge
 import com.panosdim.flatman.paddingSmall
 import com.panosdim.flatman.utils.FieldState
 import com.panosdim.flatman.utils.currencyRegex
+import com.panosdim.flatman.utils.deleteEvent
+import com.panosdim.flatman.utils.insertEvent
 import com.panosdim.flatman.utils.toEpochMilli
 import com.panosdim.flatman.utils.toLocalDate
+import com.panosdim.flatman.utils.updateEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -198,6 +201,9 @@ fun EditFlatForm(flat: Flat) {
                                 .collect {
                                     withContext(Dispatchers.Main) {
                                         if (it) {
+                                            flat.lessee?.eventID?.let {
+                                                deleteEvent(context, it)
+                                            }
                                             Toast.makeText(
                                                 context,
                                                 R.string.delete_flat_result,
@@ -394,16 +400,52 @@ fun EditFlatForm(flat: Flat) {
                                         .toString()
                                 it.end = datePickerStateEnd.selectedDateMillis?.toLocalDate()
                                     .toString()
+
+                                it.eventID?.let { eventId ->
+                                    datePickerStateEnd.selectedDateMillis?.toLocalDate()
+                                        ?.let { date ->
+                                            val eventDate = date.minusMonths(1)
+                                            updateEvent(
+                                                context, eventId, eventDate, resources.getString(
+                                                    R.string.rent_ends,
+                                                    address.value
+                                                )
+                                            )
+                                        }
+                                } ?: kotlin.run {
+                                    datePickerStateEnd.selectedDateMillis?.toLocalDate()
+                                        ?.let { date ->
+                                            val eventDate = date.minusMonths(1)
+                                            it.eventID =
+                                                insertEvent(
+                                                    context, eventDate, resources.getString(
+                                                        R.string.rent_ends,
+                                                        address.value
+                                                    )
+                                                )
+                                        }
+                                }
                             }
                         } ?: run {
                             if (isAddingLessee) {
+                                val eventDate =
+                                    datePickerStateEnd.selectedDateMillis?.toLocalDate()
+                                        ?.minusMonths(1)
                                 val lessee = Lessee(
                                     name = lesseeName.value,
                                     rent = lesseeRent.value.toFloat(),
                                     start = datePickerStateStart.selectedDateMillis?.toLocalDate()
                                         .toString(),
                                     end = datePickerStateEnd.selectedDateMillis?.toLocalDate()
-                                        .toString()
+                                        .toString(),
+                                    eventID = eventDate?.let {
+                                        insertEvent(
+                                            context, it, resources.getString(
+                                                R.string.rent_ends,
+                                                address.value
+                                            )
+                                        )
+                                    }
                                 )
                                 flat.lessee = lessee
                             }

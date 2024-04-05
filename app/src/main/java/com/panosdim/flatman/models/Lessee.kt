@@ -8,4 +8,5 @@ data class Lessee(
     var rent: Float = 0.0F,
     var start: String = "",
     var end: String = "",
+    var eventID: Long? = null
 )

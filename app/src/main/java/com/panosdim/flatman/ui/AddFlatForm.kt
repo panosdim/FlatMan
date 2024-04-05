@@ -50,6 +50,7 @@ import com.panosdim.flatman.paddingLarge
 import com.panosdim.flatman.paddingSmall
 import com.panosdim.flatman.utils.FieldState
 import com.panosdim.flatman.utils.currencyRegex
+import com.panosdim.flatman.utils.insertEvent
 import com.panosdim.flatman.utils.toEpochMilli
 import com.panosdim.flatman.utils.toLocalDate
 import kotlinx.coroutines.CoroutineScope
@@ -277,13 +278,23 @@ fun AddFlatForm() {
                         )
 
                         if (isAddingLessee) {
+                            val eventDate = datePickerStateUntil.selectedDateMillis?.toLocalDate()
+                                ?.minusMonths(1)
                             newFlat.lessee = Lessee(
                                 name = lesseeName.value,
                                 rent = lesseeRent.value.toFloat(),
                                 start = datePickerStateFrom.selectedDateMillis?.toLocalDate()
                                     .toString(),
                                 end = datePickerStateUntil.selectedDateMillis?.toLocalDate()
-                                    .toString()
+                                    .toString(),
+                                eventID = eventDate?.let {
+                                    insertEvent(
+                                        context, it, resources.getString(
+                                            R.string.rent_ends,
+                                            address.value
+                                        )
+                                    )
+                                }
                             )
                         }
 

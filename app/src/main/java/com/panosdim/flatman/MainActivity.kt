@@ -14,9 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
 import com.google.firebase.FirebaseApp
 import com.panosdim.flatman.ui.MainScreen
 import com.panosdim.flatman.ui.theme.FlatManTheme
+import com.panosdim.flatman.utils.REQUEST_CODE_PERMISSIONS
+import com.panosdim.flatman.utils.REQUIRED_PERMISSIONS
+import com.panosdim.flatman.utils.allPermissionsGranted
 import com.panosdim.flatman.utils.checkForNewVersion
 import com.panosdim.flatman.utils.refId
 import kotlinx.coroutines.CoroutineScope
@@ -63,6 +67,13 @@ class MainActivity : ComponentActivity() {
         // Check for new version
         scope.launch {
             checkForNewVersion(this@MainActivity)
+        }
+
+        // Check for permissions
+        if (!allPermissionsGranted(baseContext)) {
+            ActivityCompat.requestPermissions(
+                this, REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
         }
 
         setContent {
