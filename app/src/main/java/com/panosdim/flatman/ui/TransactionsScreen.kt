@@ -29,7 +29,8 @@ fun TransactionsScreen(flat: Flat) {
     Column(modifier = Modifier.fillMaxWidth()) {
         TabRow(selectedTabIndex = pagerState.currentPage) {
             tabs.forEachIndexed { index, title ->
-                Tab(text = { Text(title) },
+                Tab(
+                    text = { Text(title) },
                     selected = pagerState.currentPage == index,
                     onClick = {
                         scope.launch { pagerState.animateScrollToPage(index) }
@@ -52,7 +53,7 @@ fun TransactionsScreen(flat: Flat) {
         }
         HorizontalPager(state = pagerState) { page ->
             when (page) {
-                0 -> FlatRents(flat)
+                0 -> FlatExpenses(flat)
                 1 -> FlatExpenses(flat)
             }
         }

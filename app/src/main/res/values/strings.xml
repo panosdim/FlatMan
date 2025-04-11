@@ -12,8 +12,8 @@
     <string name="add_flat">Add Flat</string>
     <string name="logout">Logout</string>
     <string name="no_items">No flats found</string>
-    <string name="rent_ends">Contract ends: %1$s</string>
-    <string name="flat_savings">Savings: %1$s</string>
+    <string name="rent_ends">Contract ends %1$s</string>
+    <string name="flat_savings">Savings %1$s</string>
     <string name="savings">Savings</string>
     <string name="total">Total</string>
     <string name="last_year">Last Year</string>
@@ -60,5 +60,6 @@
     <string name="delete_flat_dialog_description">If you delete the flat all expenses and rents of the flat will also be deleted.</string>
     <string name="delete_flat_result">Flat deleted successfully</string>
     <string name="update_flat_result">Flat updated successfully</string>
+    <string name="fetching_data">Fetching data</string>
 
 </resources>

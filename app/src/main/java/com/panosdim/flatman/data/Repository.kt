@@ -11,6 +11,7 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.panosdim.flatman.TAG
 import com.panosdim.flatman.models.Flat
+import com.panosdim.flatman.models.Response
 import com.panosdim.flatman.models.Transaction
 import com.panosdim.flatman.utils.TransactionType
 import com.panosdim.flatman.utils.isDateInPreviousYear
@@ -27,11 +28,12 @@ class Repository {
     private val database = Firebase.database
     private var listeners: MutableMap<DatabaseReference, ValueEventListener> = mutableMapOf()
 
-    fun getFlats(): Flow<List<Flat>> = callbackFlow {
+    fun getFlats(): Flow<Response<List<Flat>>> = callbackFlow {
         val dbRef = user?.let { database.getReference(it.uid).child("flats") }
 
         val listener = dbRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                trySend(Response.Loading)
                 val items = mutableListOf<Flat>()
                 snapshot.children.forEach { flat ->
                     val itm = flat.getValue(Flat::class.java)
@@ -41,10 +43,11 @@ class Repository {
                     }
                 }
 
-                trySend(items)
+                trySend(Response.Success(items))
             }
 
             override fun onCancelled(error: DatabaseError) {
+                trySend(Response.Error(error.message))
                 Log.e(TAG, error.toString())
                 cancel()
             }
@@ -255,11 +258,12 @@ class Repository {
         }
     }
 
-    fun getRents(flatId: String): Flow<List<Transaction>> = callbackFlow {
+    fun getRents(flatId: String): Flow<Response<List<Transaction>>> = callbackFlow {
         val dbRef = user?.let { database.getReference(it.uid).child("rents").child(flatId) }
 
         val listener = dbRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                trySend(Response.Loading)
                 val rents = mutableListOf<Transaction>()
                 snapshot.children.forEach { rent ->
                     val itm = rent.getValue(Transaction::class.java)
@@ -271,10 +275,11 @@ class Repository {
 
                 rents.sortByDescending { it.date }
 
-                trySend(rents)
+                trySend(Response.Success(rents))
             }
 
             override fun onCancelled(error: DatabaseError) {
+                trySend(Response.Error(error.message))
                 Log.e(TAG, error.toString())
                 cancel()
             }
