@@ -1,5 +1,6 @@
 package com.panosdim.flatman.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,15 +19,23 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Apartment
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -38,9 +47,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.panosdim.flatman.R
+import com.panosdim.flatman.TAG
 import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response
@@ -78,14 +89,18 @@ fun RentsScreen() {
     viewModel.getRents(selectedFlat?.id.toString())
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
     var rents by remember { mutableStateOf(emptyList<Transaction>()) }
+    var expandedFlat by remember { mutableStateOf(false) }
 
+    Log.d(TAG, "RentsScreen: $selectedFlat")
 
     when (flatsResponse) {
         is Response.Success -> {
             isLoading = false
 
             flats = (flatsResponse as Response.Success<List<Flat>>).data
-            selectedFlat = flats.firstOrNull()
+            if (selectedFlat == null) {
+                selectedFlat = flats.firstOrNull()
+            }
         }
 
         is Response.Error -> {
@@ -180,7 +195,8 @@ fun RentsScreen() {
             // Show Rents
             LazyColumn(
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentPadding = PaddingValues(horizontal = paddingLarge, vertical = paddingLarge),
                 state = listState
             ) {
@@ -237,10 +253,64 @@ fun RentsScreen() {
                     }
                 }
             }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = paddingLarge, end = paddingLarge),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                ExposedDropdownMenuBox(
+                    expanded = expandedFlat,
+                    onExpandedChange = { expandedFlat = it },
+                ) {
+                    Button(
+                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
+                        onClick = { expandedFlat = !expandedFlat },
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(Icons.Default.Apartment, null)
+                            Text(selectedFlat?.address ?: "")
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedFlat)
+                        }
+                    }
+                    ExposedDropdownMenu(
+                        expanded = expandedFlat,
+                        onDismissRequest = { expandedFlat = false },
+                    ) {
+                        flats.forEach { selectionOption ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(selectionOption.address)
+                                },
+                                onClick = {
+                                    selectedFlat = selectionOption
+                                    expandedFlat = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+
+                TextButton(onClick = { /* doSomething() */ }) {
+                    Icon(Icons.Filled.Add, contentDescription = "Add Rent")
+                    Text("Add Rent")
+                }
+            }
         }
     }
 
     selectedFlat?.let {
-        EditTransactionSheet(it, TransactionType.RENTS, selectedRent, editTransactionSheetState)
+        EditTransactionSheet(
+            it,
+            TransactionType.RENTS,
+            selectedRent,
+            editTransactionSheetState
+        )
     }
 }

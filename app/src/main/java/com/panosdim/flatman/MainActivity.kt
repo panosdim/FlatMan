@@ -20,7 +20,6 @@ import androidx.core.app.ActivityCompat
 import com.google.firebase.FirebaseApp
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings
-import com.panosdim.flatman.ui.DashboardScreen
 import com.panosdim.flatman.ui.MainScreen
 import com.panosdim.flatman.ui.theme.FlatManTheme
 import com.panosdim.flatman.utils.REQUEST_CODE_PERMISSIONS

@@ -229,6 +229,15 @@ fun EditTransactionSheet(
                         )
                     }
                 }
+
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineSmall,
+                    text = flat.address
+                )
+                
                 OutlinedTextField(
                     value = amount.value,
                     keyboardOptions = KeyboardOptions(
