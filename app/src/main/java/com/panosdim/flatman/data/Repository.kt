@@ -221,11 +221,12 @@ class Repository {
         }
     }
 
-    fun getExpenses(flatId: String): Flow<List<Transaction>> = callbackFlow {
+    fun getExpenses(flatId: String): Flow<Response<List<Transaction>>> = callbackFlow {
         val dbRef = user?.let { database.getReference(it.uid).child("expenses").child(flatId) }
 
         val listener = dbRef?.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
+                trySend(Response.Loading)
                 val expenses = mutableListOf<Transaction>()
                 snapshot.children.forEach { expense ->
                     val itm = expense.getValue(Transaction::class.java)
@@ -237,11 +238,12 @@ class Repository {
 
                 expenses.sortByDescending { it.date }
 
-                trySend(expenses)
+                trySend(Response.Success(expenses))
             }
 
             override fun onCancelled(error: DatabaseError) {
                 Log.e(TAG, error.toString())
+                trySend(Response.Error(error.toString()))
                 cancel()
             }
         })

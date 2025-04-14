@@ -43,7 +43,7 @@ fun NavigationGraph(navController: NavHostController, paddingValues: PaddingValu
             DashboardScreen()
         }
         composable(BottomNavItem.Expenses.screenRoute) {
-//            ExpensesScreen()
+            ExpensesScreen()
         }
         composable(BottomNavItem.Rents.screenRoute) {
             RentsScreen()

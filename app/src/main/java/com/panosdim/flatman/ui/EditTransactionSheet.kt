@@ -1,6 +1,5 @@
 package com.panosdim.flatman.ui
 
-import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
@@ -149,6 +149,7 @@ fun EditTransactionSheet(
                                     viewModel.deleteTransaction(it, transaction, transactionType)
                                         .collect {
                                             withContext(Dispatchers.Main) {
+                                                isLoading = false
                                                 if (it) {
                                                     if (transactionType == TransactionType.EXPENSES) {
                                                         Toast.makeText(
@@ -164,10 +165,8 @@ fun EditTransactionSheet(
                                                         ).show()
                                                     }
 
-                                                    (context as? Activity)?.finish()
+                                                    scope.launch { bottomSheetState.hide() }
                                                 } else {
-                                                    isLoading = false
-
                                                     Toast.makeText(
                                                         context,
                                                         R.string.generic_error_toast,
@@ -199,10 +198,6 @@ fun EditTransactionSheet(
             onDismissRequest = { scope.launch { bottomSheetState.hide() } },
             sheetState = bottomSheetState,
         ) {
-            if (isLoading) {
-                ProgressBar()
-            }
-
             Column(
                 Modifier.padding(paddingLarge),
                 verticalArrangement = Arrangement.Center,
@@ -237,7 +232,7 @@ fun EditTransactionSheet(
                     style = MaterialTheme.typography.headlineSmall,
                     text = flat.address
                 )
-                
+
                 OutlinedTextField(
                     value = amount.value,
                     keyboardOptions = KeyboardOptions(
@@ -298,6 +293,14 @@ fun EditTransactionSheet(
                     state = datePickerState, label = stringResource(id = R.string.date)
                 )
 
+                if (isLoading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = paddingLarge)
+                    )
+                }
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -337,6 +340,7 @@ fun EditTransactionSheet(
                                         )
                                             .collect {
                                                 withContext(Dispatchers.Main) {
+                                                    isLoading = false
                                                     if (it) {
                                                         if (transactionType == TransactionType.EXPENSES) {
                                                             Toast.makeText(
@@ -352,10 +356,8 @@ fun EditTransactionSheet(
                                                             ).show()
                                                         }
 
-                                                        (context as? Activity)?.finish()
+                                                        scope.launch { bottomSheetState.hide() }
                                                     } else {
-                                                        isLoading = false
-
                                                         Toast.makeText(
                                                             context,
                                                             R.string.generic_error_toast,

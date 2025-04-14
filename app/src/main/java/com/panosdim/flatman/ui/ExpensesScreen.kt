@@ -1,5 +1,6 @@
 package com.panosdim.flatman.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.panosdim.flatman.R
+import com.panosdim.flatman.TAG
 import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response
@@ -66,7 +68,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RentsScreen() {
+fun ExpensesScreen() {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val viewModel: MainViewModel = viewModel()
@@ -79,7 +81,7 @@ fun RentsScreen() {
     val editTransactionSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
     )
-    var selectedRent: Transaction by remember { mutableStateOf(Transaction()) }
+    var selectedExpense: Transaction by remember { mutableStateOf(Transaction()) }
 
     val flatsResponse by viewModel.getFlats()
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
@@ -89,10 +91,10 @@ fun RentsScreen() {
 
     var selectedFlat by remember { mutableStateOf<Flat?>(null) }
 
-    val rentsResponse by
-    viewModel.getRents(selectedFlat?.id.toString())
+    val expensesResponse by
+    viewModel.getExpenses(selectedFlat?.id.toString())
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
-    var rents by remember { mutableStateOf(emptyList<Transaction>()) }
+    var expenses by remember { mutableStateOf(emptyList<Transaction>()) }
     var expandedFlat by remember { mutableStateOf(false) }
 
     when (flatsResponse) {
@@ -121,11 +123,12 @@ fun RentsScreen() {
         }
     }
 
-    when (rentsResponse) {
+    when (expensesResponse) {
         is Response.Success -> {
             isLoading = false
 
-            rents = (rentsResponse as Response.Success<List<Transaction>>).data
+            expenses = (expensesResponse as Response.Success<List<Transaction>>).data
+            Log.d(TAG, expenses.toString())
         }
 
         is Response.Error -> {
@@ -202,8 +205,8 @@ fun RentsScreen() {
                 contentPadding = PaddingValues(horizontal = paddingLarge, vertical = paddingLarge),
                 state = listState
             ) {
-                if (rents.isNotEmpty()) {
-                    rents.forEach { rent ->
+                if (expenses.isNotEmpty()) {
+                    expenses.forEach { rent ->
                         item {
                             ListItem(headlineContent = {
                                 Text(
@@ -220,7 +223,7 @@ fun RentsScreen() {
                                     style = MaterialTheme.typography.headlineSmall,
                                 )
                             }, modifier = Modifier.clickable {
-                                selectedRent = rent
+                                selectedExpense = rent
                                 scope.launch { editTransactionSheetState.show() }
                             })
                             HorizontalDivider()
@@ -245,10 +248,10 @@ fun RentsScreen() {
                                 Icon(
                                     Icons.Default.Info,
                                     modifier = Modifier.fillMaxHeight(),
-                                    contentDescription = stringResource(id = R.string.no_rents),
+                                    contentDescription = stringResource(id = R.string.no_expenses),
                                 )
                                 Text(
-                                    text = stringResource(id = R.string.no_rents)
+                                    text = stringResource(id = R.string.no_expenses)
                                 )
                             }
                         }
@@ -307,7 +310,7 @@ fun RentsScreen() {
                     )
                     Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                     Text(
-                        stringResource(id = R.string.add_rent)
+                        stringResource(id = R.string.add_expense)
                     )
                 }
             }
@@ -317,13 +320,13 @@ fun RentsScreen() {
     selectedFlat?.let {
         AddTransactionSheet(
             it,
-            TransactionType.RENTS,
+            TransactionType.EXPENSES,
             addTransactionSheetState
         )
         EditTransactionSheet(
             it,
-            TransactionType.RENTS,
-            selectedRent,
+            TransactionType.EXPENSES,
+            selectedExpense,
             editTransactionSheetState
         )
     }
