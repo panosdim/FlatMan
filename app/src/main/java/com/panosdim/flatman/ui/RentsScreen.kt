@@ -99,6 +99,7 @@ fun RentsScreen() {
         is Response.Success -> {
             isLoading = false
 
+            flats = emptyList()
             flats = (flatsResponse as Response.Success<List<Flat>>).data
             if (selectedFlat == null) {
                 selectedFlat = flats.firstOrNull()
@@ -125,6 +126,7 @@ fun RentsScreen() {
         is Response.Success -> {
             isLoading = false
 
+            rents = emptyList()
             rents = (rentsResponse as Response.Success<List<Transaction>>).data
         }
 

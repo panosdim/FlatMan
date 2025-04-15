@@ -1,6 +1,5 @@
 package com.panosdim.flatman.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +53,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.panosdim.flatman.R
-import com.panosdim.flatman.TAG
 import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response
@@ -101,6 +99,7 @@ fun ExpensesScreen() {
         is Response.Success -> {
             isLoading = false
 
+            flats = emptyList()
             flats = (flatsResponse as Response.Success<List<Flat>>).data
             if (selectedFlat == null) {
                 selectedFlat = flats.firstOrNull()
@@ -127,8 +126,8 @@ fun ExpensesScreen() {
         is Response.Success -> {
             isLoading = false
 
+            expenses = emptyList()
             expenses = (expensesResponse as Response.Success<List<Transaction>>).data
-            Log.d(TAG, expenses.toString())
         }
 
         is Response.Error -> {
