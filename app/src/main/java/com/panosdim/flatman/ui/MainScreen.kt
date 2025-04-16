@@ -49,7 +49,7 @@ fun NavigationGraph(navController: NavHostController, paddingValues: PaddingValu
             RentsScreen()
         }
         composable(BottomNavItem.Flats.screenRoute) {
-//            FlatsScreen()
+            FlatsScreen()
         }
     }
 

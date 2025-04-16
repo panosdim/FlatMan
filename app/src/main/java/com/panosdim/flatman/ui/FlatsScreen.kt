@@ -1,7 +1,6 @@
 package com.panosdim.flatman.ui
 
 import android.widget.Toast
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,9 +19,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,9 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.panosdim.flatman.R
@@ -45,28 +39,14 @@ import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response
 import com.panosdim.flatman.paddingLarge
-import com.panosdim.flatman.ui.theme.blueDark
-import com.panosdim.flatman.ui.theme.blueLight
-import com.panosdim.flatman.ui.theme.redDark
-import com.panosdim.flatman.ui.theme.redLight
-import com.panosdim.flatman.utils.moneyFormat
-import java.math.BigDecimal
 
 
 @Composable
-fun DashboardScreen() {
+fun FlatsScreen() {
     val context = LocalContext.current
-    val resources = context.resources
+    context.resources
     val viewModel: MainViewModel = viewModel()
     val listState = rememberLazyListState()
-
-    val darkTheme: Boolean = isSystemInDarkTheme()
-
-    val totalSavings = viewModel.getSavings()
-        .collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
-
-    val lastYearSavings =
-        viewModel.getLastYearSavings().collectAsStateWithLifecycle(initialValue = BigDecimal.ZERO)
 
     val flatsResponse by viewModel.getFlats()
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
@@ -78,6 +58,7 @@ fun DashboardScreen() {
         is Response.Success -> {
             isLoading = false
 
+            flats = emptyList()
             flats = (flatsResponse as Response.Success<List<Flat>>).data
         }
 
@@ -147,82 +128,6 @@ fun DashboardScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            ElevatedCard(
-                modifier = Modifier
-                    .padding(paddingLarge)
-                    .fillMaxWidth(),
-                shape = MaterialTheme.shapes.medium,
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 6.dp
-                ),
-            ) {
-                Column(modifier = Modifier.padding(paddingLarge)) {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        text = resources.getString(R.string.savings),
-                        style = MaterialTheme.typography.headlineLarge,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                text = resources.getString(R.string.total),
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = moneyFormat(totalSavings.value),
-                                textAlign = TextAlign.Center,
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = if (totalSavings.value > BigDecimal(0)) {
-                                    if (darkTheme) blueDark else blueLight
-                                } else {
-                                    if (darkTheme) redDark else redLight
-                                },
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Column(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
-                        ) {
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                text = resources.getString(R.string.last_year),
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                modifier = Modifier.fillMaxWidth(),
-                                textAlign = TextAlign.Center,
-                                text = moneyFormat(lastYearSavings.value),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = if (lastYearSavings.value > BigDecimal(0)) {
-                                    if (darkTheme) blueDark else blueLight
-                                } else {
-                                    if (darkTheme) redDark else redLight
-                                },
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                }
-            }
-
             // Show Flats
             LazyColumn(
                 Modifier
@@ -233,7 +138,7 @@ fun DashboardScreen() {
                 if (flats.isNotEmpty()) {
                     flats.forEach {
                         item {
-                            DashboardFlatCard(flat = it)
+                            FlatCard(flat = it)
                         }
                     }
                 } else {
