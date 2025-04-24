@@ -18,15 +18,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,12 +43,14 @@ import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response
 import com.panosdim.flatman.paddingLarge
+import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlatsScreen() {
     val context = LocalContext.current
-    context.resources
+    val scope = rememberCoroutineScope()
     val viewModel: MainViewModel = viewModel()
     val listState = rememberLazyListState()
 
@@ -53,6 +59,11 @@ fun FlatsScreen() {
 
     var flats by remember { mutableStateOf(emptyList<Flat>()) }
     var isLoading by remember { mutableStateOf(false) }
+
+    val skipPartiallyExpanded by remember { mutableStateOf(true) }
+    val addFlatSheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = skipPartiallyExpanded
+    )
 
     when (flatsResponse) {
         is Response.Success -> {
@@ -131,7 +142,8 @@ fun FlatsScreen() {
             // Show Flats
             LazyColumn(
                 Modifier
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .weight(1f),
                 contentPadding = PaddingValues(horizontal = paddingLarge, vertical = paddingLarge),
                 state = listState
             ) {
@@ -170,6 +182,15 @@ fun FlatsScreen() {
                     }
                 }
             }
+            Button(
+                onClick = { scope.launch { addFlatSheetState.show() } },
+            ) {
+                Text(stringResource(R.string.add_flat))
+            }
         }
     }
+
+    AddFlatSheet(
+        addFlatSheetState
+    )
 }

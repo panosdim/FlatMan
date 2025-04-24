@@ -61,5 +61,7 @@
     <string name="delete_flat_result">Flat deleted successfully</string>
     <string name="update_flat_result">Flat updated successfully</string>
     <string name="fetching_data">Fetching data</string>
+    <string name="is_rented">Is rented</string>
+    <string name="edit_flat">Edit Flat</string>
 
 </resources>

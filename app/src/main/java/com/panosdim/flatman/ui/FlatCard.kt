@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -29,6 +30,7 @@ import com.panosdim.flatman.ui.theme.yellowLight
 import com.panosdim.flatman.utils.formatDate
 import com.panosdim.flatman.utils.moneyFormat
 import com.panosdim.flatman.utils.toLocalDate
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.TemporalAdjusters
 
@@ -39,7 +41,7 @@ fun FlatCard(
 ) {
     val context = LocalContext.current
     val resources = context.resources
-//    val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
 
     val darkTheme: Boolean = isSystemInDarkTheme()
     val today = LocalDate.now()
@@ -48,7 +50,7 @@ fun FlatCard(
     var color: Color = Color.Unspecified
 
     val skipPartiallyExpanded by remember { mutableStateOf(true) }
-    rememberModalBottomSheetState(
+    val editFlatSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = skipPartiallyExpanded
     )
 
@@ -70,6 +72,7 @@ fun FlatCard(
             .padding(paddingSmall)
             .fillMaxWidth()
             .wrapContentHeight(),
+        onClick = { scope.launch { editFlatSheetState.show() } },
         shape = MaterialTheme.shapes.medium
     ) {
         Column(Modifier.padding(paddingLarge)) {
@@ -101,4 +104,6 @@ fun FlatCard(
             }
         }
     }
+
+    EditFlatSheet(flat, editFlatSheetState)
 }
