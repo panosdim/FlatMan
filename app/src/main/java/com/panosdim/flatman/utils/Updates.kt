@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.pm.PackageInfoCompat
+import androidx.core.net.toUri
 import com.panosdim.flatman.R
 import com.panosdim.flatman.TAG
 import com.panosdim.flatman.models.FileMetadata
@@ -17,7 +18,6 @@ import java.io.BufferedReader
 import java.net.HttpURLConnection
 import java.net.URL
 import javax.net.ssl.HttpsURLConnection
-import androidx.core.net.toUri
 
 var refId: Long = -1
 

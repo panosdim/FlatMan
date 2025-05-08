@@ -72,7 +72,7 @@ class MainActivity : ComponentActivity() {
 
         remoteConfig = FirebaseRemoteConfig.getInstance()
         val configSettings = FirebaseRemoteConfigSettings.Builder()
-            .setMinimumFetchIntervalInSeconds(2592000) // Fetch at least every 30 days
+            .setMinimumFetchIntervalInSeconds(0)
             .build()
         remoteConfig.setConfigSettingsAsync(configSettings)
 
