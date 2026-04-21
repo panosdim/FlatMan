@@ -1,14 +1,14 @@
 package com.panosdim.flatman.data
 
 import android.util.Log
-import com.google.firebase.auth.ktx.auth
+import com.google.firebase.auth.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.getValue
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.Firebase
+import com.google.firebase.database.database
 import com.panosdim.flatman.TAG
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Response

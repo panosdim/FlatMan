@@ -28,13 +28,13 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -84,21 +84,18 @@ fun RentsScreen() {
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
 
     var flats by remember { mutableStateOf(emptyList<Flat>()) }
-    var isLoading by remember { mutableStateOf(false) }
-
     var selectedFlat by remember { mutableStateOf<Flat?>(null) }
 
     val rentsResponse by
     viewModel.getRents(selectedFlat?.id.toString())
         .collectAsStateWithLifecycle(initialValue = Response.Loading)
+
+    val isLoading = flatsResponse is Response.Loading || rentsResponse is Response.Loading
     var rents by remember { mutableStateOf(emptyList<Transaction>()) }
     var expandedFlat by remember { mutableStateOf(false) }
 
     when (flatsResponse) {
         is Response.Success -> {
-            isLoading = false
-
-            flats = emptyList()
             flats = (flatsResponse as Response.Success<List<Flat>>).data
             if (selectedFlat == null) {
                 selectedFlat = flats.firstOrNull()
@@ -112,37 +109,26 @@ fun RentsScreen() {
                 Toast.LENGTH_SHORT
             )
                 .show()
-
-            isLoading = false
         }
 
-        is Response.Loading -> {
-            isLoading = true
-        }
+        is Response.Loading -> {}
     }
 
     when (rentsResponse) {
         is Response.Success -> {
-            isLoading = false
-
-            rents = emptyList()
             rents = (rentsResponse as Response.Success<List<Transaction>>).data
         }
 
         is Response.Error -> {
             Toast.makeText(
                 context,
-                (flatsResponse as Response.Error).errorMessage,
+                (rentsResponse as Response.Error).errorMessage,
                 Toast.LENGTH_SHORT
             )
                 .show()
-
-            isLoading = false
         }
 
-        is Response.Loading -> {
-            isLoading = true
-        }
+        is Response.Loading -> {}
     }
 
     if (isLoading) {
@@ -269,7 +255,7 @@ fun RentsScreen() {
                     onExpandedChange = { expandedFlat = it },
                 ) {
                     Button(
-                        modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable),
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable),
                         onClick = { expandedFlat = !expandedFlat },
                     ) {
                         Row(
