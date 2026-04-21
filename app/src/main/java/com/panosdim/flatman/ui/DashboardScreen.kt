@@ -56,7 +56,6 @@ import java.math.BigDecimal
 @Composable
 fun DashboardScreen() {
     val context = LocalContext.current
-    val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val listState = rememberLazyListState()
 
@@ -160,7 +159,7 @@ fun DashboardScreen() {
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        text = resources.getString(R.string.savings),
+                        text = stringResource(R.string.savings),
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -177,7 +176,7 @@ fun DashboardScreen() {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                text = resources.getString(R.string.total),
+                                text = stringResource(R.string.total),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold
                             )
@@ -202,7 +201,7 @@ fun DashboardScreen() {
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 textAlign = TextAlign.Center,
-                                text = resources.getString(R.string.last_year),
+                                text = stringResource(R.string.last_year),
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold
                             )

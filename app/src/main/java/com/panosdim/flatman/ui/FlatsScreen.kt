@@ -69,7 +69,6 @@ fun FlatsScreen() {
         is Response.Success -> {
             isLoading = false
 
-            flats = emptyList()
             flats = (flatsResponse as Response.Success<List<Flat>>).data
         }
 

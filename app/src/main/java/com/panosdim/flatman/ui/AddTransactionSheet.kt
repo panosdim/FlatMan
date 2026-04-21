@@ -68,7 +68,6 @@ fun AddTransactionSheet(
     bottomSheetState: SheetState
 ) {
     val context = LocalContext.current
-    val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -82,25 +81,26 @@ fun AddTransactionSheet(
         val date by remember { mutableStateOf(LocalDate.now()) }
         val datePickerState =
             rememberDatePickerState(initialSelectedDateMillis = date.toEpochMilli())
-
+        val commentErrorEmpty = stringResource(R.string.comment_error_empty)
         val comment = remember {
             FieldState("") {
                 if (transactionType == TransactionType.RENTS && it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.comment_error_empty)
+                        commentErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
+        val amountErrorEmpty = stringResource(R.string.amount_error_empty)
         val amount = remember {
             FieldState("") {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.amount_error_empty)
+                        amountErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
@@ -149,7 +149,7 @@ fun AddTransactionSheet(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.headlineLarge,
-                            text = resources.getString(R.string.add_rent)
+                            text = stringResource(R.string.add_rent)
                         )
                     }
 
@@ -159,7 +159,7 @@ fun AddTransactionSheet(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.headlineLarge,
-                            text = resources.getString(R.string.add_expense)
+                            text = stringResource(R.string.add_expense)
                         )
                     }
                 }
@@ -251,13 +251,13 @@ fun AddTransactionSheet(
                     Button(
                         enabled = isFormValid(),
                         onClick = {
-                            datePickerState.selectedDateMillis?.toLocalDate()?.let {
+                            datePickerState.selectedDateMillis?.toLocalDate()?.let { localDate ->
                                 isLoading = true
 
                                 val newTransaction = Transaction(
                                     id = null,
                                     amount = amount.value.toFloat(),
-                                    date = it.toString(),
+                                    date = localDate.toString(),
                                     comment = comment.value
                                 )
 

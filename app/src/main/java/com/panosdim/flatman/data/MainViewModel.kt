@@ -2,6 +2,8 @@ package com.panosdim.flatman.data
 
 
 import androidx.lifecycle.ViewModel
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
 import com.panosdim.flatman.models.Flat
 import com.panosdim.flatman.models.Transaction
 import com.panosdim.flatman.utils.TransactionType
@@ -49,5 +51,6 @@ class MainViewModel : ViewModel() {
 
     fun signOut() {
         repository.signOut()
+        Firebase.auth.signOut()
     }
 }

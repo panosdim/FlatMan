@@ -54,8 +54,7 @@ import java.time.temporal.TemporalAdjusters
 fun DashboardFlatCard(
     flat: Flat,
 ) {
-    val context = LocalContext.current
-    val resources = context.resources
+    LocalContext.current
     val scope = rememberCoroutineScope()
     val viewModel: MainViewModel = viewModel()
 
@@ -110,7 +109,7 @@ fun DashboardFlatCard(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Text(
-                        text = resources.getString(
+                        text = stringResource(
                             R.string.rent_ends,
                             it.end.formatDate()
                         ),
@@ -124,7 +123,7 @@ fun DashboardFlatCard(
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                text = resources.getString(
+                text = stringResource(
                     R.string.flat_savings,
                     moneyFormat(flatSavings.value)
                 ),

@@ -18,6 +18,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.panosdim.flatman.R
 import com.panosdim.flatman.models.Flat
@@ -39,8 +40,7 @@ import java.time.temporal.TemporalAdjusters
 fun FlatCard(
     flat: Flat,
 ) {
-    val context = LocalContext.current
-    val resources = context.resources
+    LocalContext.current
     val scope = rememberCoroutineScope()
 
     val darkTheme: Boolean = isSystemInDarkTheme()
@@ -93,7 +93,7 @@ fun FlatCard(
                         style = MaterialTheme.typography.headlineSmall
                     )
                     Text(
-                        text = resources.getString(
+                        text = stringResource(
                             R.string.rent_ends,
                             it.end.formatDate()
                         ),

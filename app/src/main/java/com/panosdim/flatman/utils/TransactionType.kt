@@ -4,11 +4,11 @@ interface IGetFirebasePath {
     fun getFirebasePath(): String
 }
 
-enum class TransactionType(val title: String) : IGetFirebasePath {
-    RENTS("Rents") {
+enum class TransactionType : IGetFirebasePath {
+    RENTS {
         override fun getFirebasePath() = "rents"
     },
-    EXPENSES("Expenses") {
+    EXPENSES {
         override fun getFirebasePath() = "expenses"
     },
 }

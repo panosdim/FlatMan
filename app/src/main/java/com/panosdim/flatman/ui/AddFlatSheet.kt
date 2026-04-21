@@ -64,7 +64,6 @@ fun AddFlatSheet(
     bottomSheetState: SheetState
 ) {
     val context = LocalContext.current
-    val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val focusRequester = remember { FocusRequester() }
@@ -79,36 +78,39 @@ fun AddFlatSheet(
 
     // Sheet content
     if (bottomSheetState.isVisible) {
-        val address = remember {
+        val addressErrorEmpty = stringResource(R.string.address_error_empty)
+        val address = remember(addressErrorEmpty) {
             FieldState("") {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.address_error_empty)
+                        addressErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
-        val lesseeName = remember {
+        val lesseeNameErrorEmpty = stringResource(R.string.lessee_name_error_empty)
+        val lesseeName = remember(lesseeNameErrorEmpty) {
             FieldState("") {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.lessee_name_error_empty)
+                        lesseeNameErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
-        val lesseeRent = remember {
+        val lesseeRentErrorEmpty = stringResource(R.string.lessee_rent_error_empty)
+        val lesseeRent = remember(lesseeRentErrorEmpty) {
             FieldState("") {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.lessee_rent_error_empty)
+                        lesseeRentErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
@@ -152,7 +154,7 @@ fun AddFlatSheet(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineLarge,
-                    text = resources.getString(R.string.add_flat)
+                    text = stringResource(R.string.add_flat)
                 )
 
                 OutlinedTextField(
@@ -278,11 +280,14 @@ fun AddFlatSheet(
                         .fillMaxWidth()
                         .padding(top = paddingLarge)
                 ) {
+                    val eventTitle = stringResource(
+                        R.string.rent_ends,
+                        address.value
+                    )
                     Button(
                         enabled = isFormValid(),
                         onClick = {
                             isLoading = true
-
                             val newFlat = Flat(
                                 id = null,
                                 address = address.value,
@@ -293,6 +298,7 @@ fun AddFlatSheet(
                                 val eventDate =
                                     datePickerStateUntil.selectedDateMillis?.toLocalDate()
                                         ?.minusMonths(1)
+
                                 newFlat.lessee = Lessee(
                                     name = lesseeName.value,
                                     rent = lesseeRent.value.toFloat(),
@@ -302,10 +308,7 @@ fun AddFlatSheet(
                                         .toString(),
                                     eventID = eventDate?.let {
                                         insertEvent(
-                                            context, it, resources.getString(
-                                                R.string.rent_ends,
-                                                address.value
-                                            )
+                                            context, it, eventTitle
                                         )
                                     }
                                 )

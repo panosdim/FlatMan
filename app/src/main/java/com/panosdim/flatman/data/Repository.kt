@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.combine
 import java.math.BigDecimal
 
 class Repository {
-    private val user = Firebase.auth.currentUser
+    private val user get() = Firebase.auth.currentUser
     private val database = Firebase.database
     private var listeners: MutableMap<DatabaseReference, ValueEventListener> = mutableMapOf()
 
@@ -591,10 +591,9 @@ class Repository {
     }
 
     fun signOut() {
-        listeners.let { list ->
-            list.forEach {
-                it.key.removeEventListener(it.value)
-            }
+        listeners.forEach { (dbRef, listener) ->
+            dbRef.removeEventListener(listener)
         }
+        listeners.clear()
     }
 }

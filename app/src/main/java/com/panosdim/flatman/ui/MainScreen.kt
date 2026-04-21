@@ -3,29 +3,71 @@ package com.panosdim.flatman.ui
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.panosdim.flatman.LoginActivity
+import com.panosdim.flatman.MainActivity
+import com.panosdim.flatman.data.MainViewModel
 import com.panosdim.flatman.utils.BottomNavItem
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val viewModel: MainViewModel = viewModel()
+    val context = LocalContext.current
+
     Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text("FlatMan") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent
+                ),
+                actions = {
+                    IconButton(onClick = {
+                        viewModel.signOut()
+                        (context as? MainActivity)?.startActivity(
+                            android.content.Intent(
+                                context,
+                                LoginActivity::class.java
+                            ).apply {
+                                flags =
+                                    android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.Logout,
+                            contentDescription = "Logout"
+                        )
+                    }
+                }
+            )
+        },
         bottomBar = { BottomNavigation(navController = navController) }
     ) { innerPadding ->
         NavigationGraph(navController = navController, innerPadding)

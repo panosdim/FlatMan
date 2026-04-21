@@ -66,7 +66,6 @@ fun EditTransactionSheet(
     bottomSheetState: SheetState
 ) {
     val context = LocalContext.current
-    val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val openDeleteDialog = remember { mutableStateOf(false) }
@@ -81,24 +80,26 @@ fun EditTransactionSheet(
         val datePickerState =
             rememberDatePickerState(initialSelectedDateMillis = date.toEpochMilli())
 
+        val commentErrorEmpty = stringResource(R.string.comment_error_empty)
         val comment = remember {
             FieldState(transaction.comment) {
                 if (transactionType == TransactionType.RENTS && it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.comment_error_empty)
+                        commentErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
+        val amountErrorEmpty = stringResource(R.string.amount_error_empty)
         val amount = remember {
             FieldState(transaction.amount.toString()) {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.amount_error_empty)
+                        amountErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
@@ -145,8 +146,12 @@ fun EditTransactionSheet(
                             isLoading = true
 
                             scope.launch {
-                                flat.id?.let {
-                                    viewModel.deleteTransaction(it, transaction, transactionType)
+                                flat.id?.let { flatID ->
+                                    viewModel.deleteTransaction(
+                                        flatID,
+                                        transaction,
+                                        transactionType
+                                    )
                                         .collect {
                                             withContext(Dispatchers.Main) {
                                                 isLoading = false
@@ -210,7 +215,7 @@ fun EditTransactionSheet(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.headlineLarge,
-                            text = resources.getString(R.string.edit_rent)
+                            text = stringResource(R.string.edit_rent)
                         )
                     }
 
@@ -220,7 +225,7 @@ fun EditTransactionSheet(
                             textAlign = TextAlign.Center,
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.headlineLarge,
-                            text = resources.getString(R.string.edit_expense)
+                            text = stringResource(R.string.edit_expense)
                         )
                     }
                 }
@@ -323,11 +328,11 @@ fun EditTransactionSheet(
                     Button(
                         enabled = isFormValid(),
                         onClick = {
-                            datePickerState.selectedDateMillis?.toLocalDate()?.let {
+                            datePickerState.selectedDateMillis?.toLocalDate()?.let { localDate ->
                                 isLoading = true
 
                                 // Update transaction object
-                                transaction.date = it.toString()
+                                transaction.date = localDate.toString()
                                 transaction.amount = amount.value.toFloat()
                                 transaction.comment = comment.value
 

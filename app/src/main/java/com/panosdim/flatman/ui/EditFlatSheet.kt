@@ -68,7 +68,6 @@ fun EditFlatSheet(
     bottomSheetState: SheetState
 ) {
     val context = LocalContext.current
-    val resources = context.resources
     val viewModel: MainViewModel = viewModel()
     val scope = rememberCoroutineScope()
     val openDeleteDialog = remember { mutableStateOf(false) }
@@ -83,37 +82,40 @@ fun EditFlatSheet(
 
     // Sheet content
     if (bottomSheetState.isVisible) {
+        val addressErrorEmpty = stringResource(R.string.address_error_empty)
         val address = remember {
             FieldState(flat.address) {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.address_error_empty)
+                        addressErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
+        val lesseeNameErrorEmpty = stringResource(R.string.lessee_name_error_empty)
         val lesseeName = remember {
             FieldState(flat.lessee?.name ?: "") {
                 if (it.isEmpty()) {
                     return@FieldState Pair(
                         true,
-                        context.getString(R.string.lessee_name_error_empty)
+                        lesseeNameErrorEmpty
                     )
                 }
                 return@FieldState Pair(false, "")
             }
         }
 
+        val lesseeRentErrorEmpty = stringResource(R.string.lessee_rent_error_empty)
         val lesseeRent = remember {
             flat.lessee?.rent?.let { rent ->
                 FieldState(rent.toString()) {
                     if (it.isEmpty()) {
                         return@FieldState Pair(
                             true,
-                            context.getString(R.string.lessee_rent_error_empty)
+                            lesseeRentErrorEmpty
                         )
                     }
                     return@FieldState Pair(false, "")
@@ -123,7 +125,7 @@ fun EditFlatSheet(
                     if (it.isEmpty()) {
                         return@FieldState Pair(
                             true,
-                            context.getString(R.string.lessee_rent_error_empty)
+                            lesseeRentErrorEmpty
                         )
                     }
                     return@FieldState Pair(false, "")
@@ -207,8 +209,8 @@ fun EditFlatSheet(
                                             isLoading = false
 
                                             if (it) {
-                                                flat.lessee?.eventID?.let {
-                                                    deleteEvent(context, it)
+                                                flat.lessee?.eventID?.let { eventID ->
+                                                    deleteEvent(context, eventID)
                                                 }
                                                 Toast.makeText(
                                                     context,
@@ -258,7 +260,7 @@ fun EditFlatSheet(
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.headlineLarge,
-                    text = resources.getString(R.string.edit_flat)
+                    text = stringResource(R.string.edit_flat)
                 )
 
                 OutlinedTextField(
@@ -393,7 +395,10 @@ fun EditFlatSheet(
                         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text(stringResource(id = R.string.delete))
                     }
-
+                    val eventTitle = stringResource(
+                        R.string.rent_ends,
+                        address.value
+                    )
                     Button(
                         enabled = isFormValid(),
                         onClick = {
@@ -421,10 +426,7 @@ fun EditFlatSheet(
                                                     context,
                                                     eventId,
                                                     eventDate,
-                                                    resources.getString(
-                                                        R.string.rent_ends,
-                                                        address.value
-                                                    )
+                                                    eventTitle
                                                 )
                                             }
                                     } ?: kotlin.run {
@@ -433,10 +435,7 @@ fun EditFlatSheet(
                                                 val eventDate = date.minusMonths(1)
                                                 it.eventID =
                                                     insertEvent(
-                                                        context, eventDate, resources.getString(
-                                                            R.string.rent_ends,
-                                                            address.value
-                                                        )
+                                                        context, eventDate, eventTitle
                                                     )
                                             }
                                     }
@@ -455,10 +454,7 @@ fun EditFlatSheet(
                                             .toString(),
                                         eventID = eventDate?.let {
                                             insertEvent(
-                                                context, it, resources.getString(
-                                                    R.string.rent_ends,
-                                                    address.value
-                                                )
+                                                context, it, eventTitle
                                             )
                                         }
                                     )
