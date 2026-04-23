@@ -1,9 +1,12 @@
+@file:Suppress("RedundantSuppression")
+
 package com.panosdim.flatman.utils
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 
+@Suppress("unused")
 class FieldState<T>(
     fieldValue: T,
     val validate: (T) -> Pair<Boolean, String>

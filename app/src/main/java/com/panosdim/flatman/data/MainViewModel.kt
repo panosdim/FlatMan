@@ -49,6 +49,7 @@ class MainViewModel : ViewModel() {
 
     fun getLastYearSavings() = repository.getLastYearSavings()
 
+    @Suppress("unused")
     fun signOut() {
         repository.signOut()
         Firebase.auth.signOut()
