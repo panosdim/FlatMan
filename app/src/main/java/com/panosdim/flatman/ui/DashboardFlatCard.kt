@@ -79,9 +79,7 @@ fun DashboardFlatCard(
             color = if (darkTheme) redDark else redLight
         }
 
-        if ((rentEnds.isBefore(nextMonthLastDay) || rentEnds.isEqual(nextMonthLastDay))
-            && rentEnds.isAfter(today)
-        ) {
+        if (rentEnds.isBefore(nextMonthLastDay) || rentEnds.isEqual(nextMonthLastDay)) {
             color = if (darkTheme) yellowDark else yellowLight
         }
     }
